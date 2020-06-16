@@ -26,6 +26,7 @@ then
     exit 84
 fi
 
+# lines not ending in \n area not read
 echo "" >> $1
 
 # Parse config values
@@ -98,6 +99,7 @@ fi
 echo -e "##\n## EPITECH PROJECT, ${YEAR}\n## ${PWD}\n## File description:\n## Makefile\n##" > $project_dir/Makefile
 
 # EXEC
+# If not specified, fclean will remove a.out
 if [[ -v exec ]]; then
     echo -e "\nEXEC = $exec" >> $project_dir/Makefile
 fi
