@@ -66,6 +66,14 @@ do
     fi
 done < "$1"
 
+sorted_array=()
+for value in "${source_files[@]}"
+do
+    [[ $value == *.c ]] && new_array+=($value)
+done
+source_files=("${new_array[@]}")
+unset new_array
+
 # Mandatory config values
 if [[ ! -v source_files ]] || [[ ! -v project_dir ]]
 then
