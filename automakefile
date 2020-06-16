@@ -9,16 +9,18 @@
 
 YEAR=$(date +%Y)
 DEBUG=false
+sources_dir="."
+cc="gcc"
 
 # Only 1 parameter
-if [[ $# -ne 1 ]]
+if [[ $# != 1 ]]
 then
     >&2 echo "Incorrect parameter"
     exit 84
 fi
 
 # Parameter must be valid file
-if [[ ! -f $1 ]]
+if [[ ! -e $1 ]]
 then
      >&2 echo "Config file does not exit"
     exit 84
@@ -95,12 +97,7 @@ echo -e "##\n## EPITECH PROJECT, ${YEAR}\n## ${PWD}\n## File description:\n## Ma
 
 # EXEC
 if [[ -v exec ]]; then
-    if [[ $DEBUG == true ]]; then
-        echo "[DEBUG] Adding EXEC ($exec)"
-    fi
     echo -e "\nEXEC = $exec" >> $project_dir/Makefile
-elif [[ $DEBUG == true ]]; then
-    echo "[DEBUG] EXEC not specified, skipping"
 fi
 
 # SOURCES_DIR
@@ -160,7 +157,7 @@ if [[ -v headers_dir ]]; then
     if [[ $DEBUG == true ]]; then
         echo "[DEBUG] Adding HEADERS_DIR ($headers_dir)"
     fi
-    echo -e "\nHEADERS_DIR = -I $headers_dir" >> $project_dir/Makefile
+    echo -e "\nHEADERS_DIR = $headers_dir" >> $project_dir/Makefile
 elif [[ $DEBUG == true ]]; then
     echo "[DEBUG] HEADERS_DIR not specified, skipping"
 fi
@@ -170,7 +167,7 @@ if [[ -v libs_dir ]]; then
     if [[ $DEBUG == true ]]; then
         echo "[DEBUG] Adding LIBS_DIR ($libs_dir)"
     fi
-    echo -e "\nLIBS_DIR = -L $libs_dir" >> $project_dir/Makefile
+    echo -e "\nLIBS_DIR = $libs_dir" >> $project_dir/Makefile
 elif [[ $DEBUG == true ]]; then
     echo "[DEBUG] LIBS_DIR not specified, skipping"
 fi
@@ -217,37 +214,27 @@ fi
 if [[ $DEBUG == true ]]; then
     echo "[DEBUG] Adding all rule"
 fi
-echo -e "\nall: \$(EXEC)" >> $project_dir/Makefile
-
-# exec rule
-if [[ $DEBUG == true ]]; then
-    echo "[DEBUG] Adding exec rule"
+echo -e "\nall: \$(OBJ)" >> $project_dir/Makefile
+if [[ -v libs_dir ]]; then
+    echo -e "\t\$(MAKE) -C \$(LIBS_DIR)" >> $project_dir/Makefile
 fi
-echo -e "\n\$(EXEC): \$(OBJ)" >> $project_dir/Makefile
-if [[ ! -v ldflags ]] && [[ ! -v libs_dir ]]; then
-    echo -e "\t\$(CC) \$(HEADERS_DIR) -o \$(EXEC) \$(OBJ)" >> $project_dir/Makefile
-else
-    echo -ne "\t\$(CC) \$(HEADERS_DIR) -o \$(EXEC) \$(OBJ)" >> $project_dir/Makefile
+echo -ne "\t\$(CC) \$(OBJ)" >> $project_dir/Makefile
+if [[ -v exec ]]; then
+    echo -ne " -o \$(EXEC)" >> $project_dir/Makefile
+fi
+if [[ -v cflags ]]; then
+    echo -ne " \$(CFLAGS)" >> $project_dir/Makefile
+fi
+if [[ -v headers_dir ]]; then
+    echo -ne " -I\$(HEADERS_DIR)" >> $project_dir/Makefile
 fi
 if [[ -v libs_dir ]]; then
-    if [[ $DEBUG == true ]]; then
-        echo "[DEBUG] Adding \$(LIBS_DIR) to exec rule"
-    fi
-    if [[ ! -v ldflags ]]; then
-        echo -e " \$(LIBS_DIR)" >> $project_dir/Makefile
-    else
-        echo -ne " \$(LIBS_DIR)" >> $project_dir/Makefile
-    fi
+    echo -ne " -L\$(LIBS_DIR)" >> $project_dir/Makefile
 fi
 if [[ -v ldflags ]]; then
-    if [[ $DEBUG == true ]]; then
-        echo "[DEBUG] Adding \$(LDFLAGS) to exec rule"
-    fi
     echo -e " \$(LDFLAGS)" >> $project_dir/Makefile
-else if [[ $DEBUG == true ]]; then
-    echo "[DEBUG] LDFLAGS not specified, skipping"
 fi
-fi
+echo -e "" >> $project_dir/Makefile
 
 # clean rule
 if [[ $DEBUG == true ]]; then
@@ -255,13 +242,23 @@ if [[ $DEBUG == true ]]; then
 fi
 echo -e "\nclean:" >> $project_dir/Makefile
 echo -e "\t\$(RM) \$(OBJ)" >> $project_dir/Makefile
+if [[ -v libs_dir ]]; then
+    echo -e "\tmake -C \$(LIBS_DIR) clean" >> $project_dir/Makefile
+fi
 
 # fclean rule
 if [[ $DEBUG == true ]]; then
     echo "[DEBUG] Adding fclean rule"
 fi
 echo -e "\nfclean: clean" >> $project_dir/Makefile
-echo -e "\t\$(RM) \$(EXEC)" >> $project_dir/Makefile
+if [[ ! -v exec ]]; then
+    echo -e "\t\$(RM) a.out"  >> $project_dir/Makefile
+else
+    echo -e "\t\$(RM) \$(EXEC)" >> $project_dir/Makefile
+fi
+if [[ -v libs_dir ]]; then
+    echo -e "\tmake -C \$(LIBS_DIR) fclean" >> $project_dir/Makefile
+fi
 
 # re rule
 if [[ $DEBUG == true ]]; then
@@ -309,6 +306,11 @@ fi
 if [[ $DEBUG == true ]]; then
     echo "[DEBUG] Adding .PHONY"
 fi
-echo -e "\n.PHONY: all clean fclean re archive revert num delete" >> $project_dir/Makefile
+echo -ne "\n.PHONY: all clean fclean re" >> $project_dir/Makefile
+if [[ ! -v bckdir ]] || [[ ! -v zip ]] || [[ ! -v zipflags ]] || [[ ! -v unzip ]] || [[ ! -v unzipflags ]]; then
+    echo "" >> $project_dir/Makefile
+else
+    echo " archive revert num delete" >> $project_dir/Makefile
+fi
 
 exit 0
