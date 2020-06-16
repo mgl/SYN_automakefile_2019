@@ -255,9 +255,6 @@ if [[ $DEBUG == true ]]; then
 fi
 echo -e "\nclean:" >> $project_dir/Makefile
 echo -e "\t\$(RM) \$(OBJ)" >> $project_dir/Makefile
-if [[ -v libs_dir ]]; then
-    echo -e "\tmake -C \$(LIBS_DIR) clean" >> $project_dir/Makefile
-fi
 
 # fclean rule
 if [[ $DEBUG == true ]]; then
@@ -269,10 +266,6 @@ if [[ ! -v exec ]]; then
 else
     echo -e "\t\$(RM) \$(EXEC)" >> $project_dir/Makefile
 fi
-if [[ -v libs_dir ]]; then
-    echo -e "\tmake -C \$(LIBS_DIR) fclean" >> $project_dir/Makefile
-fi
-
 # re rule
 if [[ $DEBUG == true ]]; then
     echo "[DEBUG] Adding re rule"
