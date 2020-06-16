@@ -1,0 +1,314 @@
+#!/usr/bin/env bash
+
+##
+## EPITECH PROJECT, 2020
+## SYN_automakefile_2019
+## File description:
+## automakefile
+##
+
+YEAR=$(date +%Y)
+DEBUG=false
+
+# Only 1 parameter
+if [[ $# -ne 1 ]]
+then
+    >&2 echo "Incorrect parameter"
+    exit 84
+fi
+
+# Parameter must be valid file
+if [[ ! -f $1 ]]
+then
+     >&2 echo "Config file does not exit"
+    exit 84
+fi
+
+# Parse config values
+IFS=';'
+while read -r line
+do
+    array=($line)
+    if [[ ${array[0]} == *.c ]]; then
+        source_files=(${array[@]})
+	elif [[ ${array[0]} == "PROJECT_DIR" ]]; then
+		project_dir=${array[1]}
+    elif [[ ${array[0]} == "SOURCES_DIR" ]]; then
+        sources_dir=${array[1]}
+    elif [[ ${array[0]} == "HEADERS_DIR" ]]; then
+        headers_dir=${array[1]}
+    elif [[ ${array[0]} == "LIBS_DIR" ]]; then
+        libs_dir=${array[1]}
+    elif [[ ${array[0]} == "EXEC" ]]; then
+        exec=${array[1]}
+    elif [[ ${array[0]} == "CC" ]]; then
+        cc=${array[1]}
+    elif [[ ${array[0]} == "CFLAGS" ]]; then
+        cflags=${array[1]}
+    elif [[ ${array[0]} == "LDFLAGS" ]]; then
+        ldflags=${array[1]}
+    elif [[ ${array[0]} == "BCK_DIR" ]]; then
+        bckdir=${array[1]}
+    elif [[ ${array[0]} == "ZIP" ]]; then
+        zip=${array[1]}
+    elif [[ ${array[0]} == "ZIPFLAGS" ]]; then
+        zipflags=${array[1]}
+    elif [[ ${array[0]} == "UNZIP" ]]; then
+        unzip=${array[1]}
+    elif [[ ${array[0]} == "UNZIPFLAGS" ]]; then
+        unzipflags=${array[1]}
+    fi
+done < "$1"
+
+# Mandatory config values
+if [[ ! -v source_files ]] || [[ ! -v project_dir ]]
+then
+     >&2 echo "PROJECT_DIR and at least one source files is mandatory"
+    exit 84
+fi
+
+# Project dir exists
+if [[ ! -d $project_dir ]]; then
+     >&2 echo "PROJECT_DIR does not exist"
+    exit 84
+fi
+
+# Debug config files
+if [[ $DEBUG == true ]]; then
+    echo "[DEBUG] -- Config Debug --"
+    echo "[DEBUG] Source files = ${source_files[@]}"
+    echo "[DEBUG] Project dir = $project_dir"
+    echo "[DEBUG] Sources dir = $sources_dir"
+    echo "[DEBUG] Headers dir = $headers_dir"
+    echo "[DEBUG] Libs dir = $libs_dir"
+    echo "[DEBUG] Exec = $exec"
+    echo "[DEBUG] cc = $cc"
+    echo "[DEBUG] cflags = $cflags"
+    echo "[DEBUG] -- End config debug --"
+fi
+
+# Epitech header
+if [[ $DEBUG == true ]]; then
+    echo "[DEBUG] Adding Epitech header"
+fi
+echo -e "##\n## EPITECH PROJECT, ${YEAR}\n## ${PWD}\n## File description:\n## Makefile\n##" > $project_dir/Makefile
+
+# EXEC
+if [[ -v exec ]]; then
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding EXEC ($exec)"
+    fi
+    echo -e "\nEXEC = $exec" >> $project_dir/Makefile
+elif [[ $DEBUG == true ]]; then
+    echo "[DEBUG] EXEC not specified, skipping"
+fi
+
+# SOURCES_DIR
+if [[ $DEBUG == true ]]; then
+    echo "[DEBUG] Adding SOURCES_DIR ($sources_dir)"
+fi
+echo -e "\nSOURCES_DIR = $sources_dir" >> $project_dir/Makefile
+
+# SRC
+if [[ $DEBUG == true ]]; then
+    echo "[DEBUG] Adding source files (${source_files[@]})"
+fi
+echo -ne "\nSRC = " >> $project_dir/Makefile
+for file in "${source_files[@]}"
+do
+    echo -e "\t\${SOURCES_DIR}/$file \\" >> $project_dir/Makefile
+done
+
+# OBJ
+if [[ $DEBUG == true ]]; then
+    echo "[DEBUG] Adding OBJ"
+fi
+echo -e "\nOBJ = \$(SRC:.c=.o)\n" >> $project_dir/Makefile
+
+# CC
+if [[ -v cc ]]; then
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding CC ($cc)"
+    fi
+    echo -e "CC = $cc" >> $project_dir/Makefile
+elif [[ $DEBUG == true ]]; then
+    echo "[DEBUG] CC not specified, skipping"
+fi
+
+# CFLAGS
+if [[ -v cflags ]]; then
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding CFLAGS ($cflags)"
+    fi
+    echo -e "\nCFLAGS = $cflags" >> $project_dir/Makefile
+elif [[ $DEBUG == true ]]; then
+    echo "[DEBUG] CFLAGS not specified, skipping"
+fi
+
+# LDFLAGS
+if [[ -v ldflags ]]; then
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding LDFLAGS ($ldflags)"
+    fi
+    echo -e "\nLDFLAGS = $ldflags" >> $project_dir/Makefile
+elif [[ $DEBUG == true ]]; then
+    echo "[DEBUG] LDFLAGS not specified, skipping"
+fi
+
+# HEADERS_DIR
+if [[ -v headers_dir ]]; then
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding HEADERS_DIR ($headers_dir)"
+    fi
+    echo -e "\nHEADERS_DIR = -I $headers_dir" >> $project_dir/Makefile
+elif [[ $DEBUG == true ]]; then
+    echo "[DEBUG] HEADERS_DIR not specified, skipping"
+fi
+
+# LIBS_DIR
+if [[ -v libs_dir ]]; then
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding LIBS_DIR ($libs_dir)"
+    fi
+    echo -e "\nLIBS_DIR = -L $libs_dir" >> $project_dir/Makefile
+elif [[ $DEBUG == true ]]; then
+    echo "[DEBUG] LIBS_DIR not specified, skipping"
+fi
+
+# Archive system requirements
+if [[ ! -v bckdir ]] || [[ ! -v zip ]] || [[ ! -v zipflags ]] || [[ ! -v unzip ]] || [[ ! -v unzipflags ]]; then
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Some config values related to the archive system are absent"
+    fi
+else
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Valid config, adding the archive system"
+    fi
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding BCK_DIR ($bckdir)"
+    fi
+    if [[ ! -d "$project_dir/$bckdir" ]]; then
+        if [[ $DEBUG == true ]]; then
+            echo "[DEBUG] BCK_DIR does not exit, it will be created ($bckdir)"
+        fi
+        mkdir "$project_dir/$bckdir"
+    fi
+    echo -e "\nPROJECT_VERSION = \$(shell ls -l \$(BCK_DIR) | tail -n 1 | tr -s ' ' | cut -d ' ' -f 9 | sed 's/backup-//' | sed 's/.zip//')" >> $project_dir/Makefile
+    echo -e "\nBCK_DIR = $bckdir" >> $project_dir/Makefile
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding ZIP ($zip)"
+    fi
+    echo -e "\nZIP = $zip" >> $project_dir/Makefile
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding ZIPFLAGS ($zipflags)"
+    fi
+    echo -e "\nZIPFLAGS = $zipflags" >> $project_dir/Makefile
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding UNZIP ($unzip)"
+    fi
+    echo -e "\nUNZIP = $unzip" >> $project_dir/Makefile
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding UNZIPFLAGS ($unzipflags)"
+    fi
+    echo -e "\nUNZIPFLAGS = $unzipflags" >> $project_dir/Makefile
+fi
+
+# all rule
+if [[ $DEBUG == true ]]; then
+    echo "[DEBUG] Adding all rule"
+fi
+echo -e "\nall: \$(EXEC)" >> $project_dir/Makefile
+
+# exec rule
+if [[ $DEBUG == true ]]; then
+    echo "[DEBUG] Adding exec rule"
+fi
+echo -e "\n\$(EXEC): \$(OBJ)" >> $project_dir/Makefile
+if [[ ! -v ldflags ]] && [[ ! -v libs_dir ]]; then
+    echo -e "\t\$(CC) \$(HEADERS_DIR) -o \$(EXEC) \$(OBJ)" >> $project_dir/Makefile
+else
+    echo -ne "\t\$(CC) \$(HEADERS_DIR) -o \$(EXEC) \$(OBJ)" >> $project_dir/Makefile
+fi
+if [[ -v libs_dir ]]; then
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding \$(LIBS_DIR) to exec rule"
+    fi
+    if [[ ! -v ldflags ]]; then
+        echo -e " \$(LIBS_DIR)" >> $project_dir/Makefile
+    else
+        echo -ne " \$(LIBS_DIR)" >> $project_dir/Makefile
+    fi
+fi
+if [[ -v ldflags ]]; then
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding \$(LDFLAGS) to exec rule"
+    fi
+    echo -e " \$(LDFLAGS)" >> $project_dir/Makefile
+else if [[ $DEBUG == true ]]; then
+    echo "[DEBUG] LDFLAGS not specified, skipping"
+fi
+fi
+
+# clean rule
+if [[ $DEBUG == true ]]; then
+    echo "[DEBUG] Adding clean rule"
+fi
+echo -e "\nclean:" >> $project_dir/Makefile
+echo -e "\t\$(RM) \$(OBJ)" >> $project_dir/Makefile
+
+# fclean rule
+if [[ $DEBUG == true ]]; then
+    echo "[DEBUG] Adding fclean rule"
+fi
+echo -e "\nfclean: clean" >> $project_dir/Makefile
+echo -e "\t\$(RM) \$(EXEC)" >> $project_dir/Makefile
+
+# re rule
+if [[ $DEBUG == true ]]; then
+    echo "[DEBUG] Adding re rule"
+fi
+echo -e "\nre: fclean all" >> $project_dir/Makefile
+
+if [[ ! -v bckdir ]] || [[ ! -v zip ]] || [[ ! -v zipflags ]] || [[ ! -v unzip ]] || [[ ! -v unzipflags ]]; then
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Some config values related to the archive system are absent"
+    fi
+else
+    # archive rule
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding archive rule"
+    fi
+    echo -e "\narchive:" >> $project_dir/Makefile
+    echo -e "\t\$(ZIP) \$(ZIPFLAGS) \$(BCK_DIR)/backup-\$\$(( \$\${c:-\$(PROJECT_VERSION)}+1 )).zip \$(SRC)" >> $project_dir/Makefile
+    echo -e "\t@echo 'backup-\$\$(( \$\${c:-\$(PROJECT_VERSION)}+1 )).zip file generated'" >> $project_dir/Makefile
+
+    # revert rule
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding revert rule"
+    fi
+    echo -e "\nrevert:" >> $project_dir/Makefile
+    echo -e "\t\$(UNZIP) \$(UNZIPFLAGS) \$(BCK_DIR)/backup-\$\$(( \$\${c:-\$(PROJECT_VERSION)}-1 )).zip" >> $project_dir/Makefile
+    echo -e "\t\$(RM) \$(BCK_DIR)/backup-\$(PROJECT_VERSION).zip" >> $project_dir/Makefile
+
+    # num rule
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding num rule"
+    fi
+    echo -e "\nnum:" >> $project_dir/Makefile
+    echo -e "\t@echo \$\$(( \$\${c:-\$(PROJECT_VERSION)}+1 ))" >> $project_dir/Makefile
+
+    # delete rule
+    if [[ $DEBUG == true ]]; then
+        echo "[DEBUG] Adding delete rule"
+    fi
+    echo -e "\ndelete:" >> $project_dir/Makefile
+    echo -e "\t\$(RM) \$(BCK_DIR)/backup-\$(PROJECT_VERSION).zip" >> $project_dir/Makefile
+fi
+
+# phony
+if [[ $DEBUG == true ]]; then
+    echo "[DEBUG] Adding .PHONY"
+fi
+echo -e "\n.PHONY: all clean fclean re archive revert num delete" >> $project_dir/Makefile
+
+exit 0
