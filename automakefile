@@ -254,7 +254,7 @@ if [[ $DEBUG == true ]]; then
     echo "[DEBUG] Adding clean rule"
 fi
 echo -e "\nclean:" >> $project_dir/Makefile
-echo -e "\trm \$(OBJ)" >> $project_dir/Makefile
+echo -e "\t\$(RM) \$(OBJ)" >> $project_dir/Makefile
 if [[ -v libs_dir ]]; then
     echo -e "\tmake -C \$(LIBS_DIR) clean" >> $project_dir/Makefile
 fi
@@ -265,9 +265,9 @@ if [[ $DEBUG == true ]]; then
 fi
 echo -e "\nfclean: clean" >> $project_dir/Makefile
 if [[ ! -v exec ]]; then
-    echo -e "\trm a.out"  >> $project_dir/Makefile
+    echo -e "\t\$(RM) a.out"  >> $project_dir/Makefile
 else
-    echo -e "\trm \$(EXEC)" >> $project_dir/Makefile
+    echo -e "\t\$(RM) \$(EXEC)" >> $project_dir/Makefile
 fi
 if [[ -v libs_dir ]]; then
     echo -e "\tmake -C \$(LIBS_DIR) fclean" >> $project_dir/Makefile
@@ -298,7 +298,7 @@ else
     fi
     echo -e "\nrevert:" >> $project_dir/Makefile
     echo -e "\t\$(UNZIP) \$(UNZIPFLAGS) \$(BCK_DIR)/backup-\$(PROJECT_VERSION).zip" >> $project_dir/Makefile
-    echo -e "\trm \$(BCK_DIR)/backup-\$(PROJECT_VERSION).zip" >> $project_dir/Makefile
+    echo -e "\t\$(RM) \$(BCK_DIR)/backup-\$(PROJECT_VERSION).zip" >> $project_dir/Makefile
 
     # num rule
     if [[ $DEBUG == true ]]; then
@@ -312,7 +312,7 @@ else
         echo "[DEBUG] Adding delete rule"
     fi
     echo -e "\ndelete:" >> $project_dir/Makefile
-    echo -e "\trm \$(BCK_DIR)/backup-\$(PROJECT_VERSION).zip" >> $project_dir/Makefile
+    echo -e "\t\$(RM) \$(BCK_DIR)/backup-\$(PROJECT_VERSION).zip" >> $project_dir/Makefile
 fi
 
 # phony
