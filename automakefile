@@ -220,7 +220,7 @@ if [[ $DEBUG == true ]]; then
 fi
 echo -e "\nall: \$(OBJ)" >> $project_dir/Makefile
 if [[ -v libs_dir ]]; then
-    echo -e "\t\make -C \$(LIBS_DIR)" >> $project_dir/Makefile
+    echo -e "\tmake -C \$(LIBS_DIR)" >> $project_dir/Makefile
 fi
 echo -ne "\t\$(CC) \$(OBJ)" >> $project_dir/Makefile
 if [[ -v exec ]]; then
