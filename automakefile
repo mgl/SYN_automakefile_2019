@@ -280,7 +280,7 @@ else
     fi
     echo -e "\narchive:" >> $project_dir/Makefile
     echo -e "\t\$(ZIP) \$(ZIPFLAGS) \$(BCK_DIR)/backup-\$\$(( \$\${c:-\$(PROJECT_VERSION)}+1 )).zip \$(SRC)" >> $project_dir/Makefile
-    echo -e "\t@echo 'backup-\$\$(( \$\${c:-\$(PROJECT_VERSION)}+1 )).zip file generated'" >> $project_dir/Makefile
+    echo -e "\t@echo \"backup-\$\$(( \$\${c:-\$(PROJECT_VERSION)}+1 )).zip file generated\"" >> $project_dir/Makefile
 
     # revert rule
     if [[ $DEBUG == true ]]; then
