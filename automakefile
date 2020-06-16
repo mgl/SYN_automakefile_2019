@@ -10,6 +10,7 @@
 YEAR=$(date +%Y)
 DEBUG=false
 sources_dir="."
+headers_dir="."
 cc="gcc"
 
 # Only 1 parameter
