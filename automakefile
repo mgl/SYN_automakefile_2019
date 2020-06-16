@@ -26,6 +26,8 @@ then
     exit 84
 fi
 
+echo "" >> $1
+
 # Parse config values
 IFS=';'
 while read -r line
