@@ -92,7 +92,7 @@ if [[ ! -d $project_dir ]]; then
     exit 84
 fi
 
-if [[ ! -d libs_dir ]]; then
+if [[ ! -f libs_dir/Makefile ]]; then
     unset libs_dir
 fi
 
