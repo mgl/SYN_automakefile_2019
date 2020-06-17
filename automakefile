@@ -303,7 +303,7 @@ else
         echo "[DEBUG] Adding delete rule"
     fi
     echo -e "\ndelete:" >> $project_dir/Makefile
-    echo -e "\t\$(RM) \$(BCK_DIR)/backup-\$\$(( \$\${c:-\$(PROJECT_VERSION)}-1 )).zip" >> $project_dir/Makefile
+    echo -e "\t\$(RM) \$(BCK_DIR)/backup-\$(PROJECT_VERSION).zip" >> $project_dir/Makefile
 fi
 
 # phony
