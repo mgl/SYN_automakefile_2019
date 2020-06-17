@@ -37,7 +37,6 @@ do
     array=($line)
     if [[ ${array[0]} == *.c ]]; then
         source_files+=(${array[@]})
-        echo "${source_files[1]}"
 	elif [[ ${array[0]} == "PROJECT_DIR" ]]; then
 		project_dir=${array[1]}
     elif [[ ${array[0]} == "SOURCES_DIR" ]]; then
@@ -73,12 +72,24 @@ do
     if [[ $value == *.c ]]; then   
         new_array+=($value)
     elif [[ $value == */* && $value == *.h ]]; then
-        headers_dir+=" -I"
-        headers_dir+=${value%/*}
+        OIFS=$IFS
+        IFS=' '
+        tmp=$value
+        for header in $tmp
+        do
+            if [[ $header == */* ]]; then
+                echo "${header%/*}"
+                headers_dir+=" -I"
+                headers_dir+=${header%/*}
+            fi
+        done
     fi
 done
 source_files=("${new_array[@]}")
 unset new_array
+
+echo "DEBUG HEADERS_DIR"
+echo "${headers_dir}"
 
 # Mandatory config values
 if [[ ! -v source_files ]] || [[ ! -v project_dir ]]
