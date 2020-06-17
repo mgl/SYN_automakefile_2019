@@ -92,6 +92,10 @@ if [[ ! -d $project_dir ]]; then
     exit 84
 fi
 
+if [[ ! -d libs_dir ]]; then
+    unset libs_dir
+fi
+
 # Debug config files
 if [[ $DEBUG == true ]]; then
     echo "[DEBUG] -- Config Debug --"
@@ -201,7 +205,6 @@ else
         fi
         mkdir "$project_dir/$bckdir"
     fi
-    echo -e "\nPROJECT_VERSION = \$(shell ls -l \$(BCK_DIR) | tail -n 1 | tr -s ' ' | cut -d ' ' -f 9 | sed 's/backup-//' | sed 's/.zip//')" >> $project_dir/Makefile
     echo -e "\nBCK_DIR = $bckdir" >> $project_dir/Makefile
     if [[ $DEBUG == true ]]; then
         echo "[DEBUG] Adding ZIP ($zip)"
@@ -211,6 +214,7 @@ else
         echo "[DEBUG] Adding ZIPFLAGS ($zipflags)"
     fi
     echo -e "\nZIPFLAGS = $zipflags" >> $project_dir/Makefile
+    echo -e "\nPROJECT_VERSION = \$(shell ls -l \$(BCK_DIR) | tr -s ' ' | cut -d ' ' -f 9 | grep -e "^backup-" | tail -n 1 | sed 's/backup-//' | sed 's/.\$(ZIP)//')" >> $project_dir/Makefile
     if [[ $DEBUG == true ]]; then
         echo "[DEBUG] Adding UNZIP ($unzip)"
     fi
@@ -219,7 +223,6 @@ else
         echo "[DEBUG] Adding UNZIPFLAGS ($unzipflags)"
     fi
     echo -e "\nUNZIPFLAGS = $unzipflags" >> $project_dir/Makefile
-    echo -e "\nFILES = \$(shell ls -R)" >> $project_dir/Makefile
 fi
 
 # all rule
@@ -281,16 +284,16 @@ else
         echo "[DEBUG] Adding archive rule"
     fi
     echo -e "\narchive:" >> $project_dir/Makefile
-    echo -e "\t\$(ZIP) \$(ZIPFLAGS) \$(BCK_DIR)/backup-\$\$(( \$\${c:-\$(PROJECT_VERSION)}+1 )).zip \$(SRC)" >> $project_dir/Makefile
-    echo -e "\t@echo \"backup-\$\$(( \$\${c:-\$(PROJECT_VERSION)}+1 )).zip file generated\"" >> $project_dir/Makefile
+    echo -e "\t\$(ZIP) \$(ZIPFLAGS) \$(BCK_DIR)/backup-\$\$(( \$\${c:-\$(PROJECT_VERSION)}+1 )).\$(ZIP) \$(SRC)" >> $project_dir/Makefile
+    echo -e "\t@echo \"backup-\$\$(( \$\${c:-\$(PROJECT_VERSION)}+1 )).\$(ZIP) file generated\"" >> $project_dir/Makefile
 
     # revert rule
     if [[ $DEBUG == true ]]; then
         echo "[DEBUG] Adding revert rule"
     fi
     echo -e "\nrevert:" >> $project_dir/Makefile
-    echo -e "\t\$(UNZIP) \$(UNZIPFLAGS) \$(BCK_DIR)/backup-\$(PROJECT_VERSION).zip" >> $project_dir/Makefile
-    echo -e "\t\$(RM) \$(BCK_DIR)/backup-\$(PROJECT_VERSION).zip" >> $project_dir/Makefile
+    echo -e "\t\$(UNZIP) \$(UNZIPFLAGS) \$(BCK_DIR)/backup-\$(PROJECT_VERSION).\$(ZIP)" >> $project_dir/Makefile
+    echo -e "\t\$(RM) \$(BCK_DIR)/backup-\$(PROJECT_VERSION).\$(ZIP)" >> $project_dir/Makefile
 
     # num rule
     if [[ $DEBUG == true ]]; then
@@ -304,8 +307,7 @@ else
         echo "[DEBUG] Adding delete rule"
     fi
     echo -e "\ndelete:" >> $project_dir/Makefile
-    echo -e "\techo \$(FILES)" >> $project_dir/Makefile
-    echo -e "\t\$(RM) \$(BCK_DIR)/backup-\$(PROJECT_VERSION).zip" >> $project_dir/Makefile
+    echo -e "\t\$(RM) \$(BCK_DIR)/backup-\$(PROJECT_VERSION).\$(ZIP)" >> $project_dir/Makefile
 fi
 
 # phony
