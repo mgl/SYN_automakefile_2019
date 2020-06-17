@@ -219,6 +219,7 @@ else
         echo "[DEBUG] Adding UNZIPFLAGS ($unzipflags)"
     fi
     echo -e "\nUNZIPFLAGS = $unzipflags" >> $project_dir/Makefile
+    echo -e "\nFILES = \$(shell ls -R)" >> $project_dir/Makefile
 fi
 
 # all rule
@@ -303,6 +304,7 @@ else
         echo "[DEBUG] Adding delete rule"
     fi
     echo -e "\ndelete:" >> $project_dir/Makefile
+    echo -e "\techo \$(FILES)" >> $project_dir/Makefile
     echo -e "\t\$(RM) \$(BCK_DIR)/backup-\$(PROJECT_VERSION).zip" >> $project_dir/Makefile
 fi
 
