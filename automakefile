@@ -69,7 +69,12 @@ done < "$1"
 sorted_array=()
 for value in "${source_files[@]}"
 do
-    [[ $value == *.c ]] && new_array+=($value)
+    if [[ $value == *.c ]]; then   
+        new_array+=($value)
+    elif [[ $value == *.h ]]; then
+        headers_dir+=" -I"
+        headers_dir+=${value%/*}
+    fi
 done
 source_files=("${new_array[@]}")
 unset new_array
@@ -146,14 +151,7 @@ elif [[ $DEBUG == true ]]; then
 fi
 
 # CFLAGS
-if [[ -v cflags ]]; then
-    if [[ $DEBUG == true ]]; then
-        echo "[DEBUG] Adding CFLAGS ($cflags)"
-    fi
-    echo -e "\nCFLAGS = $cflags" >> $project_dir/Makefile
-elif [[ $DEBUG == true ]]; then
-    echo "[DEBUG] CFLAGS not specified, skipping"
-fi
+echo -e "\nCFLAGS = $cflags -I\$(HEADERS_DIR)" >> $project_dir/Makefile
 
 # LDFLAGS
 if [[ -v ldflags ]]; then
