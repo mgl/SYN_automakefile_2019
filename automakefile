@@ -36,7 +36,8 @@ while read -r line
 do
     array=($line)
     if [[ ${array[0]} == *.c ]]; then
-        source_files=(${array[@]})
+        source_files+=(${array[@]})
+        echo "${source_files[1]}"
 	elif [[ ${array[0]} == "PROJECT_DIR" ]]; then
 		project_dir=${array[1]}
     elif [[ ${array[0]} == "SOURCES_DIR" ]]; then
@@ -71,7 +72,7 @@ for value in "${source_files[@]}"
 do
     if [[ $value == *.c ]]; then   
         new_array+=($value)
-    elif [[ $value == *.h ]]; then
+    elif [[ $value == */* && $value == *.h ]]; then
         headers_dir+=" -I"
         headers_dir+=${value%/*}
     fi
