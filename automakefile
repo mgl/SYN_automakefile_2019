@@ -78,7 +78,6 @@ do
         for header in $tmp
         do
             if [[ $header == */* ]]; then
-                echo "${header%/*}"
                 headers_dir+=" -I"
                 headers_dir+=${header%/*}
             fi
@@ -87,9 +86,6 @@ do
 done
 source_files=("${new_array[@]}")
 unset new_array
-
-echo "DEBUG HEADERS_DIR"
-echo "${headers_dir}"
 
 # Mandatory config values
 if [[ ! -v source_files ]] || [[ ! -v project_dir ]]
